@@ -85,6 +85,28 @@ class WmsShipmentsViewSet(viewsets.ModelViewSet):
         "message": "Shipment marked as failed",
         "status": shipment.status.name
     })
+    @action(detail=True, methods=['get'])
+    def track(self, request, pk=None):
+        shipment = self.get_object()
+
+        return Response({
+        "awb": shipment.awb,
+        "order": shipment.order,
+        "status": shipment.status.name,
+        "request": shipment.request,
+        "response": shipment.response
+    })
+
+    @action(detail=True, methods=['get'])
+    def print_label(self, request, pk=None):
+        shipment = self.get_object()
+
+        return Response({
+        "awb": shipment.awb,
+        "label_url": f"http://localhost:8000/labels/{shipment.awb}.pdf",
+        "message": "Label generated successfully"
+    })
+
 
 
 

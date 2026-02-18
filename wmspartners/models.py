@@ -115,8 +115,8 @@ class WmsShipments(models.Model):
         related_name='shipments'
     )
 
-    request = models.TextField(blank=True, null=True)
-    response = models.TextField(blank=True, null=True)
+    request = models.JSONField(blank=True, null=True)
+    response = models.JSONField(blank=True, null=True)
     exception = models.TextField(blank=True, null=True)
 
     status = models.ForeignKey(
