@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'wmspartners',
     'rest_framework',
+    'banking_integrations',
 ]
 
 MIDDLEWARE = [
