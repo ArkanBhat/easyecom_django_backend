@@ -12,36 +12,23 @@ import base64
 from .services.qr_service import generate_merchant_tran_id
 from .models import UPITransaction, RefundTransaction
 from .services.encryption_service import hybrid_decrypt
-
+from django.views.decorators.csrf import csrf_exempt
+from banking_integrations.services.icici_service import ICICIService
 
 @csrf_exempt
 def generate_qr(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            amount = float(data.get("amount"))
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
-            # Build payload
-            payload, merchant_tran_id = build_qr_payload(amount)
-            encrypted_payload = hybrid_encrypt(payload)
+    data = json.loads(request.body)
+    amount = data.get("amount")
 
-            # Save in DB
-            transaction = UPITransaction.objects.create(
-                merchant_tran_id=merchant_tran_id,
-                amount=amount,
-                status="PENDING"
-            )
+    if not amount:
+        return JsonResponse({"error": "Amount required"}, status=400)
 
-            return JsonResponse({
-                "message": "QR request created",
-                "merchant_tran_id": merchant_tran_id,
-                "encrypted_request": encrypted_payload
-            })
+    response = ICICIService.generate_qr(amount)
+    return JsonResponse(response)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
-    return JsonResponse({"error": "Invalid request"}, status=405)
 
 
 @csrf_exempt
